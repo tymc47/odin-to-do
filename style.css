@@ -90,7 +90,7 @@ body {
     font-size: 1.2rem;
 }
 
-#main-heading > button {
+#displayformbtn {
     background-color: inherit;
     height: 2rem;
     width: 2rem;
