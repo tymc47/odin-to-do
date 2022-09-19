@@ -67,6 +67,15 @@ body {
     padding-top: 0.3rem;
 }
 
+#addlistform {
+    display: flex;
+    display: none;
+}
+
+#listcontainer > button {
+    display: block;
+    margin-bottom: 0.5rem;
+}
 
 .maincontent {
     background-color: lightpink;
@@ -74,14 +83,14 @@ body {
     padding: 3rem 5rem;
 }
 
-/* Task Tab */
-#task-heading {
+/* Tab */
+#main-heading {
     display: flex;
     align-items: center;
     font-size: 1.2rem;
 }
 
-#task-heading > button {
+#main-heading > button {
     background-color: inherit;
     height: 2rem;
     width: 2rem;
