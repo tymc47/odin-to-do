@@ -25,24 +25,23 @@ const createList = (name) => {
     displayTasks(listToAdd.getTasks())
     }
 
-const toggleTask = (event) => {
+const toggleTask = (event, taskName) => {
     const button = event.currentTarget.classList[0];
     const listName = event.currentTarget.dataset.listname;
     const targetList = storageController.getList(listName);
-    const taskIndex = event.currentTarget.dataset.task
 
     console.log(button)
     console.log(targetList)
-    console.log(taskIndex)
+    console.log(taskName)
     switch (button) {
         case 'taskdate':
-            targetList.updateTask(taskIndex, "date", event.currentTarget.value)
+            targetList.updateTask(taskName, "date", event.currentTarget.value)
             break;   
         case 'taskimportant':
-            targetList.updateTask(taskIndex, "important", "true")
+            targetList.updateTask(taskName, "important", "true")
             break;   
         case 'taskcompleted':
-            targetList.updateTask(taskIndex, "completed", "true")
+            targetList.updateTask(taskName, "completed", "true")
             displayTasks(targetList.getTasks());
             break;   
         }  
@@ -77,13 +76,27 @@ const loadTabs = (tabName) => {
     }
 
     const loadImportantTab = () => {
-        console.log("Loading Important Tab")
+        let displayArray = []
+        const listArray = storageController.getAllListName()
+
+        listArray.forEach(list => {
+            displayArray = displayArray.concat(storageController.getList(list).getImportantTasks())
+        })
+
         loadMainContent(tabName)
+        displayTasks(displayArray)
     }
 
     const loadCompletedTab = () => {
-        console.log("Loading Completed Tab")
+        let displayArray = []
+        const listArray = storageController.getAllListName()
+
+        listArray.forEach(list => {
+            displayArray = displayArray.concat(storageController.getList(list).getCompletedTasks())
+        })
+
         loadMainContent(tabName)
+        displayTasks(displayArray)
     }
 
     const loadListTab = () => {

@@ -127,26 +127,32 @@ const displayTasks = (storage) => {
     storage.forEach((task, index) => {
         if (task.completed) {return}
         const taskTemplate = `<div class="task">
-                            <input type="checkbox" class="taskcompleted" data-task=${index} data-listname=${task.listname}>
-                            <span class="taskname" data-task=${index} data-listname=${task.listname}>${task.name}</span>
-                            <input type="date" class="taskdate" data-task=${index} value=${task.date} data-listname=${task.listname}></button>
-                            <button class="${task.important? "taskimportant true" : "taskimportant"}" data-task=${index} data-listname=${task.listname}>
+                            <input type="checkbox" class="taskcompleted" data-listname=${task.listname} data-displayorder=${index}>
+                            <span class="taskname"  data-listname=${task.listname} data-displayorder=${index}>${task.name}</span>
+                            <input type="date" class="taskdate" value=${task.date} data-listname=${task.listname} data-displayorder=${index}></button>
+                            <button class="${task.important? "taskimportant true" : "taskimportant"}" data-listname=${task.listname} data-displayorder=${index}>
                                 <span class="material-symbols-outlined">star</span>
                             </button>
                             </div>`
-        taskContainer.innerHTML += taskTemplate;
+        taskContainer.insertAdjacentHTML('beforeend', taskTemplate);
+
+        //add functionality to task buttons
+        document.querySelector(`[data-displayorder="${index}"].taskdate`).addEventListener('input', (event) => {
+            console.log(task.name)
+            toggleTask(event, task.name)
+         })
+
+        document.querySelector(`[data-displayorder="${index}"].taskimportant`).addEventListener('click', (event) => {
+            toggleTask(event, task.name)
+            event.currentTarget.classList.toggle("true")
+
+        })
+
+        document.querySelector(`[data-displayorder="${index}"].taskcompleted`).addEventListener('change', (event) => {
+            toggleTask(event, task.name)
+        })
     })
     
-    //add functionality to task buttons
-    const dateBtns = document.querySelectorAll(".taskdate")
-    const importantBtns = document.querySelectorAll(".taskimportant")
-    const completedBtns = document.querySelectorAll(".taskcompleted")
-    dateBtns.forEach(btn => btn.oninput = toggleTask)
-    importantBtns.forEach(btn => btn.onclick = (event) => {
-        toggleTask(event)
-        event.currentTarget.classList.toggle("true")
-    })
-    completedBtns.forEach(btn => btn.addEventListener("change", toggleTask))
 
 
 }
