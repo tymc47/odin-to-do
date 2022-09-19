@@ -12,13 +12,13 @@ const sidebarBtnFunction = () => {
     const closeListFormBtn = document.querySelector('#closelistform')
 
 
-    taskBtn.addEventListener('click', () => {loadTabs("tasks")})
+    taskBtn.addEventListener('click', () => {loadTabs("Tasks")})
 
-    todayBtn.addEventListener('click', () => {loadTabs("today")})
+    todayBtn.addEventListener('click', () => {loadTabs("Today")})
     
-    importantBtn.addEventListener('click', () => {loadTabs("important")})
+    importantBtn.addEventListener('click', () => {loadTabs("Important")})
 
-    completedBtn.addEventListener('click', () => {loadTabs("completed")})
+    completedBtn.addEventListener('click', () => {loadTabs("Completed")})
 
     listFormBtn.addEventListener('click', () => {
         document.querySelector('#addlistform').style.display = "block";
@@ -71,22 +71,25 @@ const loadMainContent = (tabname) => {
     
     //load display
     maincontent.innerHTML = ""   
-    const template = `<div id="main-heading">
-    <h1>${tabname}</h1>
-    <button id="displayformbtn">
-    <span class="material-symbols-outlined">add</span>
-    </button>
-    </div>
-    <div id="addtaskform">
-    <input type="text">
-    <input type="date">
-    <input class="star" type="checkbox">
-    <button type="button" id="addtask">Add</button>
-    <button type="button" id="canceladd">Cancel</button> 
-    </div>    
-    <div class="taskcontainer">
-    </div>`  
-    maincontent.innerHTML += template
+    const headingHTML = `<div id="main-heading"><h1>${tabname}</h1>
+                            <button id="displayformbtn">
+                            <span class="material-symbols-outlined">add</span>
+                            </button> 
+                            </div>
+                            <div id="addtaskform">
+                            <input type="text">
+                            <input type="date">
+                            <input class="star" type="checkbox">
+                            <button type="button" id="addtask">Add</button>
+                            <button type="button" id="canceladd">Cancel</button> 
+                            </div>
+                            <div class="taskcontainer"></div>`  
+    maincontent.innerHTML += headingHTML
+    
+    
+    if (tabname == "Important" || tabname == "Completed" || tabname == "Today") {
+        document.querySelector('#displayformbtn').style.display = "none"
+    }
 
     //form functionality and display
     const addTaskForm = document.querySelector('#addtaskform')

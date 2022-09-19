@@ -53,7 +53,6 @@ const toggleTask = (event) => {
 const loadTabs = (tabName) => {
     
     const loadTasksTab = () => {
-        const tabName = "Tasks"
         const listName = "defaulted"
         
         console.log("Loading Task Tab")
@@ -65,15 +64,26 @@ const loadTabs = (tabName) => {
     }
 
     const loadTodayTab = () => {
-        
+        let displayArray = []
+        const listArray = storageController.getAllListName()
+
+        listArray.forEach(list => {
+            displayArray = displayArray.concat(storageController.getList(list).getTodayTasks())
+        })
+
+        loadMainContent(tabName)
+        displayTasks(displayArray)
+
     }
 
     const loadImportantTab = () => {
-
+        console.log("Loading Important Tab")
+        loadMainContent(tabName)
     }
 
     const loadCompletedTab = () => {
-
+        console.log("Loading Completed Tab")
+        loadMainContent(tabName)
     }
 
     const loadListTab = () => {
@@ -84,16 +94,16 @@ const loadTabs = (tabName) => {
     }
 
     switch (tabName) {
-        case "tasks":
+        case "Tasks":
             loadTasksTab();
             break;
-        case "today":
+        case "Today":
             loadTodayTab();
             break
-        case "important":
+        case "Important":
             loadImportantTab();
             break;
-        case "completed":
+        case "Completed":
             loadCompletedTab ();
             break;
         default:
@@ -103,7 +113,7 @@ const loadTabs = (tabName) => {
 
 sidebarBtnFunction();
 loadLists(storageController.getAllListName())
-loadTabs("tasks")
+loadTabs("Tasks")
 
 //create defualt list
 if (storageController.getList("defaulted") == null) {

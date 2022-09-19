@@ -20,7 +20,12 @@ const list = (name) => {
         if (key == "completed") {tasks[index][key] ? tasks[index][key] = false : tasks[index][key] = true}
     }
 
-    return {name, addToList, getTasks, updateTask}
+    const getTodayTasks = () => {
+        const today = "2022-09-19"
+        return tasks.filter(task => task.date == today)
+    }
+
+    return {name, addToList, getTasks, updateTask, getTodayTasks}
 }
 
 export {
