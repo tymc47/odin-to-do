@@ -1,87 +1,90 @@
- import { sidebarBtnFunction, loadTasks, displayTasks, loadLists, loadMainContent } from "./domController";
+ import { sidebarBtnFunction, loadTasks, displayTasks, loadLists, loadMainContent, displayCompleted} from "./domController";
  import { task, list } from "./objectController";  
  import storageController from "./storageController";
 
+const initiateStorage = () => {
+    storageController.initiateStorage()
+}
 
 const createList = (name) => {
     storageController.newList(name)
 
     //call list display
-    loadLists(storageController.getAllListName())
+    loadLists(storageController.getListArray())
 }
 
- const addTask = (name, date, listname = "defaulted", important,) => {
+ const addTask = (name, date, listId, important) => {
      //create new task object
-     const newTask = task(name, date, listname, important, false)
-
+     const taskId = Date.now()
+     const newTask = task(name, date, listId, important, false, taskId)
+    
+     console.log(newTask)
      //add task to list
-     const listToAdd = storageController.getList(listname)
+     const listToAdd = storageController.getList(listId)
      listToAdd.addToList(newTask)
      
      //save it somewhere
-    storageController.saveList(listToAdd)
+    storageController.saveList(listToAdd, listId)
 
      
     displayTasks(listToAdd.getTasks())
     }
 
-const toggleTask = (event, taskName) => {
+const toggleTask = (event, taskId, listId) => {
     const button = event.currentTarget.classList[0];
-    const listName = event.currentTarget.dataset.listname;
-    const targetList = storageController.getList(listName);
+    const targetList = storageController.getList(listId);
 
+    console.log(listId)
     console.log(button)
     console.log(targetList)
-    console.log(taskName)
     switch (button) {
         case 'taskdate':
-            targetList.updateTask(taskName, "date", event.currentTarget.value)
+            targetList.updateTask(taskId, "date", event.currentTarget.value)
             break;   
         case 'taskimportant':
-            targetList.updateTask(taskName, "important", "true")
+            targetList.updateTask(taskId, "important", "dummypara")
             break;   
         case 'taskcompleted':
-            targetList.updateTask(taskName, "completed", "true")
-            displayTasks(targetList.getTasks());
-            break;   
+            targetList.updateTask(taskId, "completed", "dummypara")
+            break;  
+        case 'deltask':
+            targetList.deleteTask(taskId) 
         }  
 
-    storageController.saveList(targetList)
+    storageController.saveList(targetList, listId)
 }
 
 const loadTabs = (tabName) => {
     
     const loadTasksTab = () => {
-        const listName = "defaulted"
         
         console.log("Loading Task Tab")
         loadMainContent(tabName)
 
-        if (storageController.getList(listName) == null){return}
-        displayTasks(storageController.getList(listName).getTasks())
+        if (storageController.getList(0) == null){return}
+        displayTasks(storageController.getList(0).getTasks())
         
     }
 
     const loadTodayTab = () => {
         let displayArray = []
-        const listArray = storageController.getAllListName()
+        const listArray = storageController.getListArray()
 
         listArray.forEach(list => {
-            displayArray = displayArray.concat(storageController.getList(list).getTodayTasks())
-        })
+            displayArray = displayArray.concat(storageController.getList(list.listId).getTodayTasks())
+        });
 
         loadMainContent(tabName)
         displayTasks(displayArray)
-
     }
 
     const loadImportantTab = () => {
         let displayArray = []
-        const listArray = storageController.getAllListName()
+        const listArray = storageController.getListArray()
 
         listArray.forEach(list => {
-            displayArray = displayArray.concat(storageController.getList(list).getImportantTasks())
-        })
+            displayArray = displayArray.concat(storageController.getList(list.listId).getImportantTasks())
+        });
 
         loadMainContent(tabName)
         displayTasks(displayArray)
@@ -89,20 +92,22 @@ const loadTabs = (tabName) => {
 
     const loadCompletedTab = () => {
         let displayArray = []
-        const listArray = storageController.getAllListName()
+        const listArray = storageController.getListArray()
 
         listArray.forEach(list => {
-            displayArray = displayArray.concat(storageController.getList(list).getCompletedTasks())
-        })
+            displayArray = displayArray.concat(storageController.getList(list.listId).getCompletedTasks())
+        });
 
         loadMainContent(tabName)
         displayTasks(displayArray)
+        displayCompleted()
     }
 
     const loadListTab = () => {
-        const listName = storageController.getAllListName()[tabName]
-        loadMainContent(listName)
-        displayTasks(storageController.getList(listName).getTasks())
+        const listId = tabName;
+        const listName = storageController.findListNamebyId(listId)
+        loadMainContent(listName, listId)
+        displayTasks(storageController.getList(listId).getTasks())
         
     }
 
@@ -124,17 +129,16 @@ const loadTabs = (tabName) => {
     }
 }
 
+const deleteList = (listId) => {
+    storageController.deleteList(listId)
+    loadLists(storageController.getListArray())
+}
+
+initiateStorage();
 sidebarBtnFunction();
-loadLists(storageController.getAllListName())
+loadLists(storageController.getListArray())
 loadTabs("Tasks")
 
-//create defualt list
-if (storageController.getList("defaulted") == null) {
-    createList("defaulted");
-    console.log("created defaulted list")
-    addTask("first task", "2022-10-22", "defaulted", true)
-    addTask("second task", "2022-09-22", "defaulted", false)
-}
 
 
 
@@ -142,5 +146,6 @@ export {
     addTask,
     toggleTask,
     createList,
-    loadTabs
+    loadTabs,
+    deleteList
 }

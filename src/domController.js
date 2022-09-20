@@ -1,4 +1,4 @@
-import { addTask, toggleTask, createList, loadTabs } from "./index"
+import { addTask, toggleTask, createList, loadTabs, deleteList } from "./index"
 
 const maincontent = document.querySelector('.maincontent')
 
@@ -48,24 +48,31 @@ const loadLists = (listArray) => {
     listContainer.innerHTML = "";
 
     //add list button for each list
-    listArray.forEach((list, index) => {
-        if (list == "defaulted") {return}
-        listContainer.innerHTML += `<button class="list" data-list=${index}>
-        <span class="material-symbols-outlined">list</span>
-        ${list}
-        </button>`
+    listArray.forEach((list) => {
+        console.log(list)
+        if (list.listId == 0) {return}
+        listContainer.innerHTML += `<div><button class="list" data-list=${list.listId}>
+        <span class="material-symbols-outlined">list</span>${list.name}</button>
+        <button class="dellist" data-list=${list.listId}><span class="material-symbols-outlined">delete</span></button>
+        </div>`
     })
 
     //add functionality to list buttons
     const listBtns = document.querySelectorAll(".list")
+    const delListBtns = document.querySelectorAll(".dellist")
     listBtns.forEach(btn => btn.addEventListener('click', (event) => {
         loadTabs(event.currentTarget.dataset.list)
+    }))
+
+    
+    delListBtns.forEach(btn => btn.addEventListener('click', (event) => {
+        deleteList(event.currentTarget.dataset.list)
     }))
 
 }
 
 
-const loadMainContent = (tabname) => {
+const loadMainContent = (tabname, listIndex = 0) => {
     // maincontent.removeAttribute('class')
     // maincontent.classList.add('maincontent')
     
@@ -102,11 +109,10 @@ const loadMainContent = (tabname) => {
         const taskName = document.querySelector('#addtaskform > input[type="text"]')
         const taskDate = document.querySelector('#addtaskform > input[type="date"]')
         const taskImportant = document.querySelector('#addtaskform > input[type="checkbox"]')
-        const taskList = tabname == "Tasks" ? "defaulted" : tabname; 
         if (taskName.value == "") {alert("Please enter a tilte for your task!"); return;}
 
         addTaskForm.style.display = "none";
-        addTask(taskName.value, taskDate.value, taskList, taskImportant.checked)
+        addTask(taskName.value, taskDate.value, listIndex, taskImportant.checked)
         taskName.value = ""
         taskDate.value = ""
         taskImportant.checked = false
@@ -118,48 +124,65 @@ const loadMainContent = (tabname) => {
 
 }
 
-const displayTasks = (storage) => {
+const displayTasks = (taskArray) => {
     const taskContainer = document.querySelector('.taskcontainer')
     taskContainer.innerHTML = ""
 
     //display all task
-    console.log(storage)
-    storage.forEach((task, index) => {
-        if (task.completed) {return}
-        const taskTemplate = `<div class="task">
-                            <input type="checkbox" class="taskcompleted" data-listname=${task.listname} data-displayorder=${index}>
-                            <span class="taskname"  data-listname=${task.listname} data-displayorder=${index}>${task.name}</span>
-                            <input type="date" class="taskdate" value=${task.date} data-listname=${task.listname} data-displayorder=${index}></button>
-                            <button class="${task.important? "taskimportant true" : "taskimportant"}" data-listname=${task.listname} data-displayorder=${index}>
-                                <span class="material-symbols-outlined">star</span>
-                            </button>
-                            </div>`
+    console.log(taskArray)
+    taskArray.forEach((task, index) => {
+        const taskTemplate = `<div class="${task.completed ? "task completed" : "task"}" data-displayorder=${index}>
+        <input type="checkbox" class="taskcompleted" data-displayorder=${index}>
+        <span class="taskname" data-displayorder=${index}>${task.name}</span>
+        <input type="date" class="taskdate" data-displayorder=${index} value=${task.date} >
+        <button class="${task.important? "taskimportant true" : "taskimportant"}" data-displayorder=${index}>
+        <span class="material-symbols-outlined">star</span>
+        </button>
+        <button class="deltask" data-displayorder=${index}><span class="material-symbols-outlined">delete</span></button>
+        </div>`
+
         taskContainer.insertAdjacentHTML('beforeend', taskTemplate);
 
+        console.log(task.taskId)
+        console.log(task.listId)
         //add functionality to task buttons
         document.querySelector(`[data-displayorder="${index}"].taskdate`).addEventListener('input', (event) => {
-            console.log(task.name)
-            toggleTask(event, task.name)
+            toggleTask(event, task.taskId, task.listId)
          })
 
         document.querySelector(`[data-displayorder="${index}"].taskimportant`).addEventListener('click', (event) => {
-            toggleTask(event, task.name)
+            toggleTask(event, task.taskId, task.listId)
             event.currentTarget.classList.toggle("true")
 
         })
 
         document.querySelector(`[data-displayorder="${index}"].taskcompleted`).addEventListener('change', (event) => {
-            toggleTask(event, task.name)
+            toggleTask(event, task.taskId, task.listId)
+            //tasks disappear from the list after toggle
+            document.querySelector(`[data-displayorder="${index}"].task`).style.display = "none"
+        })
+
+        document.querySelector(`[data-displayorder="${index}"].deltask`).addEventListener('click', (event) => {
+            toggleTask(event, task.taskId, task.listId)
+            document.querySelector(`[data-displayorder="${index}"].task`).style.display = "none"
         })
     })
-    
 
+}
 
+const displayCompleted = () => {
+    const tasks = document.querySelectorAll(".task.completed")
+    tasks.forEach(task => {
+        console.log(task)
+        task.style.display = "flex"
+        task.querySelector("input[type=checkbox]").checked = true;
+    });
 }
 
 export {
     sidebarBtnFunction,
     loadMainContent,
     displayTasks,
-    loadLists
+    loadLists,
+    displayCompleted
 }
