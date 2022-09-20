@@ -106,11 +106,14 @@ const loadTabs = (tabName) => {
     const loadListTab = () => {
         const listId = tabName;
         const listName = storageController.findListNamebyId(listId)
+        console.log(listName)
         loadMainContent(listName, listId)
+        console.log("now display tasks for tab")
         displayTasks(storageController.getList(listId).getTasks())
         
     }
 
+    console.log("before tab switch")
     switch (tabName) {
         case "Tasks":
             loadTasksTab();

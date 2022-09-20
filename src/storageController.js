@@ -44,7 +44,6 @@ const storageController = {
 
     getList: (listId) => {
         const listName = storageController.findListNamebyId(listId)
-        if (localStorage.getItem(listId) == null) {return null}
         const tasks = JSON.parse(localStorage.getItem(listId)) || []
         const calledList = list(listName)
         tasks.forEach(task => calledList.addToList(task))

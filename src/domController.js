@@ -51,16 +51,17 @@ const loadLists = (listArray) => {
     listArray.forEach((list) => {
         console.log(list)
         if (list.listId == 0) {return}
-        listContainer.innerHTML += `<div><button class="list" data-list=${list.listId}>
+        listContainer.innerHTML += `<div class="list"><button class="list" data-list=${list.listId}>
         <span class="material-symbols-outlined">list</span>${list.name}</button>
         <button class="dellist" data-list=${list.listId}><span class="material-symbols-outlined">delete</span></button>
         </div>`
     })
 
     //add functionality to list buttons
-    const listBtns = document.querySelectorAll(".list")
+    const listBtns = document.querySelectorAll("button.list")
     const delListBtns = document.querySelectorAll(".dellist")
     listBtns.forEach(btn => btn.addEventListener('click', (event) => {
+        console.log(event.currentTarget.dataset.list)
         loadTabs(event.currentTarget.dataset.list)
     }))
 
@@ -111,6 +112,7 @@ const loadMainContent = (tabname, listIndex = 0) => {
         const taskImportant = document.querySelector('#addtaskform > input[type="checkbox"]')
         if (taskName.value == "") {alert("Please enter a tilte for your task!"); return;}
 
+        console.log("adding task")
         addTaskForm.style.display = "none";
         addTask(taskName.value, taskDate.value, listIndex, taskImportant.checked)
         taskName.value = ""
@@ -125,6 +127,7 @@ const loadMainContent = (tabname, listIndex = 0) => {
 }
 
 const displayTasks = (taskArray) => {
+    console.log("displaying Task")
     const taskContainer = document.querySelector('.taskcontainer')
     taskContainer.innerHTML = ""
 
