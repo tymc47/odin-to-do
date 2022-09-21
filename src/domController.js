@@ -21,7 +21,7 @@ const sidebarBtnFunction = () => {
     completedBtn.addEventListener('click', () => {loadTabs("Completed")})
 
     listFormBtn.addEventListener('click', () => {
-        document.querySelector('#addlistform').style.display = "block";
+        document.querySelector('#addlistform').style.display = "flex";
     })
 
     addListBtn.addEventListener('click', () => {
