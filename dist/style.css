@@ -22,11 +22,35 @@ body {
     display: flex;
     align-items: center;
     font-size: 1.5rem;
+    padding: 0 3rem 0 3rem;
 }
 
-.banner > .material-symbols-outlined {
-    margin: 1rem 1rem 1rem 3rem;
+.logo > .material-symbols-outlined {
+    margin: 1rem 1rem 1rem 1rem;
     font-size: 2.5rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    flex: 1
+}
+
+.banner > .login {
+    display: flex;
+    align-items: center;
+}
+
+#userpic, #username {
+    margin-right: 1rem;
+}
+
+#loginbtn, #logoutbtn {
+    border: #e53170 solid;
+    border-radius: 5px;
+    color: #e53170;
+    background-color: #262626;
+    cursor: pointer;
 }
 
 /* sidebar */
