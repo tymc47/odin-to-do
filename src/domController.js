@@ -4,44 +4,95 @@ import {
   createList,
   loadTabs,
   deleteList,
-  signIn,
+  googleSignIn,
   signOutUser,
+  registerUser,
+  signIn,
 } from "./index";
 
 const maincontent = document.querySelector(".maincontent");
 const loginBtn = document.querySelector("#loginbtn");
 const logoutBtn = document.querySelector("#logoutbtn");
+const sideBar = document.querySelector(".sidebar");
+const loginPage = document.querySelector("#login-page");
+const googleBtn = document.querySelector("#googlebtn");
+const signUpBtn = document.querySelector("#signupbtn");
+const loginPageBtn = document.querySelector("#loginpagebtn");
+const loginForm = document.querySelector("#loginform");
+const signupForm = document.querySelector("#signupform");
+const registerBtn = document.querySelector("#registerbtn");
 
 const userControl = () => {
   logoutBtn.addEventListener("click", signOutUser);
-  loginBtn.addEventListener("click", signIn);
+  googleBtn.addEventListener("click", googleSignIn);
+  registerBtn.addEventListener("click", () => {
+    const email = document.querySelector("#sign_email");
+    const password = document.querySelector("#sign_password");
+    const confirm = document.querySelector("#sign_confirm");
+
+    registerUser(email.value, password.value, confirm.value);
+
+    password.value = "";
+    confirm.value = "";
+  });
+
+  loginBtn.addEventListener("click", () => {
+    const email = document.querySelector("#email");
+    const password = document.querySelector("#password");
+
+    signIn(email.value, password.value);
+    email.value = "";
+    password.value = "";
+  });
+
+  loginPageBtn.addEventListener("click", () => {
+    loginForm.removeAttribute("style");
+    signupForm.style.display = "none";
+    signUpBtn.removeAttribute("hidden");
+    loginPageBtn.setAttribute("hidden", "true");
+  });
+
+  signUpBtn.addEventListener("click", () => {
+    signupForm.removeAttribute("style");
+    loginForm.style.display = "none";
+    loginPageBtn.removeAttribute("hidden");
+    signUpBtn.setAttribute("hidden", "true");
+  });
 };
 
-const toggleUser = (username, picUri) => {
-  const usernameBox = document.querySelector("#username");
-  const userpicBox = document.querySelector("#userpic");
+const usernameBox = document.querySelector("#username");
+const userpicBox = document.querySelector("#userpic");
 
-  if (username) {
-    console.log(username, "is logged in");
-    logoutBtn.removeAttribute("hidden");
-    loginBtn.setAttribute("hidden", "true");
+const logoutDisplay = () => {
+  console.log("user is logged out");
+  loginBtn.removeAttribute("hidden");
+  logoutBtn.setAttribute("hidden", "true");
+  usernameBox.setAttribute("hidden", "true");
+  userpicBox.setAttribute("hidden", "true");
+  sideBar.setAttribute("hidden", "true");
+  maincontent.setAttribute("hidden", "true");
+  loginPage.removeAttribute("style");
+};
 
+const loginDisplay = (username, picUri) => {
+  console.log(username, "is logged in");
+  sideBar.removeAttribute("hidden");
+  maincontent.removeAttribute("hidden");
+  logoutBtn.removeAttribute("hidden");
+  loginPage.style.display = "none";
+  userpicBox.innerHTML = "";
+
+  if (picUri) {
     const icon = document.createElement("img");
     icon.style.height = "50px";
     icon.style.width = "50px";
     icon.style.borderRadius = "50px";
     icon.src = picUri;
     userpicBox.appendChild(icon);
-    usernameBox.textContent = username;
-    usernameBox.removeAttribute("hidden");
-    userpicBox.removeAttribute("hidden");
-  } else {
-    console.log("user is logged out");
-    loginBtn.removeAttribute("hidden");
-    logoutBtn.setAttribute("hidden", "true");
-    usernameBox.setAttribute("hidden", "true");
-    userpicBox.setAttribute("hidden", "true");
   }
+  usernameBox.textContent = username;
+  usernameBox.removeAttribute("hidden");
+  userpicBox.removeAttribute("hidden");
 };
 
 const sidebarBtnFunction = () => {
@@ -127,11 +178,12 @@ const loadLists = (listArray) => {
   delListBtns.forEach((btn) =>
     btn.addEventListener("click", (event) => {
       deleteList(event.currentTarget.dataset.list);
+      loadTabs("Tasks");
     })
   );
 };
 
-const loadMainContent = (tabname, listIndex = 0) => {
+const loadMainContent = (tabname, listIndex = "") => {
   // maincontent.removeAttribute('class')
   // maincontent.classList.add('maincontent')
 
@@ -263,6 +315,26 @@ const displayCompleted = () => {
   });
 };
 
+const displaySignupMsg = (msg) => {
+  const msgbox = document.querySelector("#signupmsg");
+
+  msgbox.textContent = msg;
+
+  setTimeout(() => {
+    msgbox.textContent = " ";
+  }, 5000);
+};
+
+const displayLoginMsg = (msg) => {
+  const msgbox = document.querySelector("#loginmsg");
+
+  msgbox.textContent = msg;
+
+  setTimeout(() => {
+    msgbox.textContent = " ";
+  }, 5000);
+};
+
 export {
   sidebarBtnFunction,
   loadMainContent,
@@ -270,5 +342,8 @@ export {
   loadLists,
   displayCompleted,
   userControl,
-  toggleUser,
+  loginDisplay,
+  logoutDisplay,
+  displaySignupMsg,
+  displayLoginMsg,
 };

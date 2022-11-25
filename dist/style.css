@@ -45,13 +45,68 @@ body {
     margin-right: 1rem;
 }
 
-#loginbtn, #logoutbtn {
+#logoutbtn {
     border: #e53170 solid;
     border-radius: 5px;
     color: #e53170;
     background-color: #262626;
     cursor: pointer;
 }
+
+#login-page {
+    grid-column: 1/3;
+    display: flex;
+    justify-content: center;
+    padding-top: 5%
+}
+
+#logincontainer {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    width: 30%;
+    height: 60%;
+    background-color: #262626;
+    border-radius: 10px;
+    border: none;
+    color: #f9f9f9;
+    padding: 0 2rem 2rem 2rem;
+}
+
+#loginform, #signupsidebar, #signupform {
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+}
+
+#loginform > input, #signupform > input {
+    line-height: 1.5rem;
+    width: 15rem;
+}
+
+#signupsidebar {
+    justify-content: center;
+}
+
+#signupmsg, #loginsg{
+    color: #e53170
+}
+
+#loginbtn, #signupbtn, #googlebtn,#loginpagebtn, #demobtn, #registerbtn {
+    border: #e53170 solid;
+    border-radius: 5px;
+    color: #e53170;
+    background-color: #262626;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem
+}
+
+#loginbtn, #registerbtn {
+    width: 10rem;
+    margin-top: 1rem;
+}
+
+
 
 /* sidebar */
 .sidebar {

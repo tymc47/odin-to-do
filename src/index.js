@@ -1,33 +1,64 @@
 import {
-  sidebarBtnFunction,
   loadTasks,
   displayTasks,
   loadLists,
   loadMainContent,
   displayCompleted,
   userControl,
-  toggleUser,
+  loginDisplay,
+  logoutDisplay,
+  sidebarBtnFunction,
+  displaySignupMsg,
+  displayLoginMsg,
 } from "./domController";
-import { task, list } from "./objectController";
+import { task } from "./objectController";
 import storageController from "./storageController";
 import { getFirebaseConfig } from "./firebase-config";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import {
   getAuth,
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
+import { validateEmail } from "./utils";
+import firestore from "./storageController_firestore";
 
 const firebaseConfig = getFirebaseConfig();
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const db = getFirestore(app);
 
-const signIn = async () => {
+const googleSignIn = () => {
   let provider = new GoogleAuthProvider();
-  await signInWithPopup(getAuth(), provider);
+  signInWithPopup(getAuth(), provider)
+    .then((result) => {
+      const user = result.user;
+    })
+    .catch((err) => {
+      displayLoginMsg(err.message);
+    });
+};
+
+const signIn = (email, password) => {
+  if (!email || !password) {
+    return displayLoginMsg("Missing email or password");
+  }
+
+  if (!validateEmail(email)) {
+    return displayLoginMsg("Invalid email");
+  }
+
+  signInWithEmailAndPassword(getAuth(), email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+    })
+    .catch((err) => {
+      displayLoginMsg(err.message);
+    });
 };
 
 function signOutUser() {
@@ -36,11 +67,38 @@ function signOutUser() {
 }
 
 function getUserName() {
-  return getAuth().currentUser.displayName;
+  return getAuth().currentUser.displayName || getAuth().currentUser.email;
 }
 function getProfilePicUrl() {
-  return getAuth().currentUser.photoURL || "/images/profile_placeholder.png";
+  return getAuth().currentUser.photoURL || null;
 }
+
+const registerUser = (email, password, confirm) => {
+  if (!email || !password || !confirm) {
+    return displaySignupMsg("Error: Missing email or password");
+  }
+
+  if (!validateEmail(email)) {
+    return displaySignupMsg("Error: invalid email");
+  }
+
+  if (password.length < 6) {
+    return displaySignupMsg("Error: invalid password");
+  }
+
+  if (password !== confirm) {
+    return displaySignupMsg("Error: passwords don't match");
+  }
+
+  createUserWithEmailAndPassword(getAuth(), email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log(userCredential.user);
+    })
+    .catch((err) => {
+      displaySignupMsg("Error: " + err.message);
+    });
+};
 
 const initiateStorage = () => {
   storageController.initiateStorage();
@@ -55,11 +113,22 @@ const authStateObserver = (user) => {
     const username = getUserName();
     const proPic = getProfilePicUrl();
 
-    toggleUser(username, proPic);
+    let userData;
+    firestore.userExist(user.uid).then((result) => {
+      userData = result;
+      if (!userData) {
+        firestore.createUser(user.uid, user.email);
+      }
+    });
+
+    loginDisplay(username, proPic);
+    sidebarBtnFunction();
+    loadLists(storageController.getListArray());
+    loadTabs("Tasks");
 
     console.log("user sign in");
   } else {
-    toggleUser();
+    logoutDisplay();
   }
 };
 
@@ -72,18 +141,17 @@ const createList = (name) => {
 
 const addTask = (name, date, listId, important) => {
   //create new task object
-  const taskId = Date.now();
-  const newTask = task(name, date, listId, important, false, taskId);
+  const newTask = task(name, date, listId, important, false);
 
   console.log(newTask);
   //add task to list
-  const listToAdd = storageController.getList(listId);
-  listToAdd.addToList(newTask);
-
+  //   const listToAdd = storageController.getList(listId);
+  //   listToAdd.addToList(newTask);
+  firestore.addTasktoList(newTask);
   //save it somewhere
-  storageController.saveList(listToAdd, listId);
-
-  displayTasks(listToAdd.getTasks());
+  //   storageController.saveList(listToAdd, listId);
+  const list = firestore.getTasksofList(listId);
+  //   displayTasks(list);
 };
 
 const toggleTask = (event, taskId, listId) => {
@@ -113,12 +181,14 @@ const toggleTask = (event, taskId, listId) => {
 const loadTabs = (tabName) => {
   const loadTasksTab = () => {
     console.log("Loading Task Tab");
-    loadMainContent(tabName);
+    const listRef = "DEFAULT_LIST" + getAuth().currentUser.uid;
+
+    loadMainContent(tabName, listRef);
 
     if (storageController.getList(0) == null) {
       return;
     }
-    displayTasks(storageController.getList(0).getTasks());
+    firestore.getTasksofList(listRef).then((result) => displayTasks(result));
   };
 
   const loadTodayTab = () => {
@@ -197,12 +267,10 @@ const deleteList = (listId) => {
   loadLists(storageController.getListArray());
 };
 
+// signOutUser();
 initiateStorage();
 initFirebaseAuth();
 userControl();
-sidebarBtnFunction();
-loadLists(storageController.getListArray());
-loadTabs("Tasks");
 
 export {
   addTask,
@@ -210,6 +278,8 @@ export {
   createList,
   loadTabs,
   deleteList,
-  signIn,
+  googleSignIn,
   signOutUser,
+  registerUser,
+  signIn,
 };

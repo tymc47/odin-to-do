@@ -17,13 +17,12 @@
                     <h1>To-Do</h1>
                 </div>
                 <div class="login">
-                    <button id="loginbtn">Login</button>
                     <div hidden id="userpic"></div>
                     <div hidden id="username"></div>
                     <button hidden id="logoutbtn">Logout</button>
                 </div>
             </div>
-            <div class="sidebar">
+            <div hidden class="sidebar">
                 <div class="navbar">
                     <button class="nav" id="tasksbtn">
                         <span class="material-symbols-outlined">add_task</span>
@@ -59,8 +58,42 @@
                     </div>
                 </div>
             </div>
-            <div class="maincontent">
+            <div hidden class="maincontent">
                 
+            </div>
+            <div id="login-page">
+                <div id="logincontainer">
+                    <div id="loginform">
+                        <h2>Welcome, login here</h2>
+                        <div id="loginmsg">&nbsp;</div>
+                      
+                        <label for="name">Email: </label>
+                        <input type="text" name="name" id="email" >
+                        <label for="name">Password: </label>
+                        <input type="password" name="name" id="password" >
+                        <button id="loginbtn">Login</button>   
+                    </div>
+                    <div id="signupform" style="display: none">
+                        <h2>Sign up now</h2>
+                        <div id="signupmsg">&nbsp;</div>
+                      
+                        <label for="name">Email: </label>
+                        <input type="email" name="name" id="sign_email">
+                        <label for="name">Password: </label>
+                        <input type="password" name="name" id="sign_password" 
+                        placeholder="at least 6 charaters long">
+                        <label for="name">Confirm Password: </label>
+                        <input type="password" name="name" id="sign_confirm" >
+                        <button id="registerbtn">Register</button>   
+                    </div>
+                    <div id="signupsidebar">
+                        <button hidden id="loginpagebtn">Login</button>
+                        <button id="signupbtn">Sign up</button>
+                        <button id="googlebtn">Google</button>
+                        <button id="demobtn">Demo</button>
+                    </div>
+
+                </div>
             </div>
         </div>
     </body>
