@@ -8,6 +8,7 @@ import {
   googleSignIn,
   anonySignIn,
 } from "./userController";
+import { compareDate } from "./utils";
 
 const maincontent = document.querySelector(".maincontent");
 const loginBtn = document.querySelector("#loginbtn");
@@ -149,7 +150,6 @@ const sidebarBtnFunction = () => {
 };
 
 const loadLists = (listArray) => {
-  console.log(listArray);
   if (listArray == null) {
     return;
   }
@@ -160,7 +160,6 @@ const loadLists = (listArray) => {
 
   //add list button for each list
   listArray.forEach((list) => {
-    console.log(list);
     if (list.listId.indexOf("DEFAULT") >= 0) {
       return;
     }
@@ -235,7 +234,6 @@ const loadMainContent = (tabname, listIndex = "") => {
       return;
     }
 
-    console.log("adding task");
     addTaskForm.style.display = "none";
     addTask(taskName.value, taskDate.value, listIndex, taskImportant.checked);
     taskName.value = "";
@@ -254,16 +252,19 @@ const displayTasks = (taskArray) => {
   taskContainer.innerHTML = "";
 
   //display all task
-  console.log("task array to display", taskArray);
-  taskArray.forEach((task, index) => {
-    const taskTemplate = `<div class="${
-      task.completed ? "task completed" : "task"
-    }" data-displayorder=${index}>
+  taskArray
+    .sort((a, b) => {
+      return compareDate(a.date, b.date);
+    })
+    .forEach((task, index) => {
+      const taskTemplate = `<div class="${
+        task.completed ? "task completed" : "task"
+      }" data-displayorder=${index}>
         <input type="checkbox" class="taskcompleted" data-displayorder=${index}>
         <span class="taskname" data-displayorder=${index}>${task.name}</span>
         <input type="date" class="taskdate" data-displayorder=${index} value=${
-      task.date
-    } >
+        task.date
+      } >
         <button class="${
           task.important ? "taskimportant true" : "taskimportant"
         }" data-displayorder=${index}>
@@ -272,49 +273,46 @@ const displayTasks = (taskArray) => {
         <button class="deltask" data-displayorder=${index}><span class="material-symbols-outlined">delete</span></button>
         </div>`;
 
-    taskContainer.insertAdjacentHTML("beforeend", taskTemplate);
+      taskContainer.insertAdjacentHTML("beforeend", taskTemplate);
 
-    console.log(task.taskId);
-    console.log(task.listId);
-    //add functionality to task buttons
-    document
-      .querySelector(`[data-displayorder="${index}"].taskdate`)
-      .addEventListener("input", (event) => {
-        toggleTask(event, task.taskId, task.listId);
-      });
+      //add functionality to task buttons
+      document
+        .querySelector(`[data-displayorder="${index}"].taskdate`)
+        .addEventListener("input", (event) => {
+          toggleTask(event, task.taskId, task.listId);
+        });
 
-    document
-      .querySelector(`[data-displayorder="${index}"].taskimportant`)
-      .addEventListener("click", (event) => {
-        toggleTask(event, task.taskId, task.listId);
-        event.currentTarget.classList.toggle("true");
-      });
+      document
+        .querySelector(`[data-displayorder="${index}"].taskimportant`)
+        .addEventListener("click", (event) => {
+          toggleTask(event, task.taskId, task.listId);
+          event.currentTarget.classList.toggle("true");
+        });
 
-    document
-      .querySelector(`[data-displayorder="${index}"].taskcompleted`)
-      .addEventListener("change", (event) => {
-        toggleTask(event, task.taskId, task.listId);
-        //tasks disappear from the list after toggle
-        document.querySelector(
-          `[data-displayorder="${index}"].task`
-        ).style.display = "none";
-      });
+      document
+        .querySelector(`[data-displayorder="${index}"].taskcompleted`)
+        .addEventListener("change", (event) => {
+          toggleTask(event, task.taskId, task.listId);
+          //tasks disappear from the list after toggle
+          document.querySelector(
+            `[data-displayorder="${index}"].task`
+          ).style.display = "none";
+        });
 
-    document
-      .querySelector(`[data-displayorder="${index}"].deltask`)
-      .addEventListener("click", (event) => {
-        toggleTask(event, task.taskId, task.listId);
-        document.querySelector(
-          `[data-displayorder="${index}"].task`
-        ).style.display = "none";
-      });
-  });
+      document
+        .querySelector(`[data-displayorder="${index}"].deltask`)
+        .addEventListener("click", (event) => {
+          toggleTask(event, task.taskId, task.listId);
+          document.querySelector(
+            `[data-displayorder="${index}"].task`
+          ).style.display = "none";
+        });
+    });
 };
 
 const displayCompleted = () => {
   const tasks = document.querySelectorAll(".task.completed");
   tasks.forEach((task) => {
-    console.log(task);
     task.style.display = "flex";
     task.querySelector("input[type=checkbox]").checked = true;
   });
