@@ -6,7 +6,7 @@ import {
   userControl,
 } from "./domController";
 import { task } from "./objectController";
-import { initFirebaseAuth, signOutUser } from "./userController";
+import { initFirebaseAuth } from "./userController";
 import { getFirebaseConfig } from "./firebase-config";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
@@ -20,8 +20,6 @@ export const db = getFirestore(app);
 
 const addTask = (name, date, listId, important) => {
   const newTask = task(name, date, listId, important, false);
-
-  console.log(newTask);
 
   firestore.addTask(newTask);
 
@@ -60,7 +58,6 @@ const loadTabs = async (tabName) => {
   const uid = getAuth().currentUser.uid;
 
   const loadTasksTab = async () => {
-    console.log("Loading Task Tab");
     const listRef = "DEFAULT_LIST" + uid;
 
     loadMainContent(tabName, listRef);
