@@ -16,6 +16,10 @@ const list = (name) => {
     return tasks;
   };
 
+  const getOneTask = (taskId) => {
+    return tasks.find((task) => task.taskId === taskId);
+  };
+
   const updateTask = (taskId, key, newValue) => {
     let taskIndex = "";
     tasks.forEach((task, index) =>
@@ -67,6 +71,7 @@ const list = (name) => {
     getImportantTasks,
     getCompletedTasks,
     deleteTask,
+    getOneTask,
   };
 };
 

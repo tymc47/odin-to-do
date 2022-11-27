@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   setDoc,
   doc,
@@ -7,21 +6,11 @@ import {
   query,
   where,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "./index";
-
-const addUser = async () => {
-  try {
-    const docRef = await addDoc(collection(db, "users"), {
-      first: "Ada",
-      last: "Lovelace",
-      born: 1815,
-    });
-    console.log("Document written with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-};
+import { list } from "./objectController";
+import { getDate } from "./utils";
 
 const userExist = async (uid) => {
   console.log(uid);
@@ -37,7 +26,7 @@ const createUser = async (uid, email) => {
     const listREF = "DEFAULT_LIST" + uid;
     await setDoc(doc(db, "lists", listREF), {
       name: "default",
-      tasks: [],
+      userId: uid,
     });
     await setDoc(doc(db, "users", uid), {
       email: email,
@@ -48,34 +37,134 @@ const createUser = async (uid, email) => {
   }
 };
 
-const getTasksofList = async (listId) => {
+const getList = async (listId) => {
   if (!listId) return null;
 
-  const q = query(collection(db, "tasks"), where("listId", "==", listId));
-  const querySnapshot = await getDocs(q);
-  const resultArray = [];
+  //query the list itself
+  const nameQuery = await getDoc(doc(db, "lists", listId));
+
+  //query tasks subcollection inside list
+  const listRef = collection(db, "lists");
+  const querySnapshot = await getDocs(collection(listRef, listId, "tasks"));
+
+  //create list object with its name and tasks
+  const resultArray = list(nameQuery.data().name);
   querySnapshot.forEach((doc) => {
-    resultArray.push(doc.data());
+    resultArray.addToList(doc.data());
   });
   return resultArray;
 };
 
-const addTasktoList = async (task) => {
-  const newTaskRef = doc(collection(db, "tasks"));
+const addTask = async (task) => {
+  const listRef = collection(db, "lists");
+  //create an Id for task
+  const newTaskRef = doc(collection(listRef, task.listId, "tasks"));
 
+  //set the id to its property
   const newTask = {
     ...task,
     taskId: newTaskRef.id,
   };
+
+  //add to subcollection inside the list
   await setDoc(newTaskRef, newTask);
 };
 
+const getUserLists = async (uid) => {
+  const q = query(collection(db, "lists"), where("userId", "==", uid));
+  const snapShot = await getDocs(q);
+  let array = [];
+  snapShot.forEach((doc) => {
+    array.push({ name: doc.data().name, listId: doc.id });
+  });
+  return array;
+};
+
+const updateTask = async (newTask) => {
+  const taskRef = newTask.taskId;
+
+  await setDoc(doc(db, "lists", newTask.listId, "tasks", taskRef), newTask);
+};
+
+const deleteTask = async (listId, taskId) => {
+  await deleteDoc(doc(db, "lists", listId, "tasks", taskId));
+};
+
+const getTodayTasks = async (uid) => {
+  const userLists = await getUserLists(uid);
+  let tasks = [];
+  for await (const list of userLists) {
+    const q = query(
+      collection(db, "lists", list.listId, "tasks"),
+      where("date", "==", getDate())
+    );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      tasks.push(doc.data());
+    });
+  }
+
+  return tasks;
+};
+
+const getImportantTasks = async (uid) => {
+  const userLists = await getUserLists(uid);
+  let tasks = [];
+  for await (const list of userLists) {
+    const q = query(
+      collection(db, "lists", list.listId, "tasks"),
+      where("important", "==", true)
+    );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      tasks.push(doc.data());
+    });
+  }
+
+  return tasks;
+};
+
+const getCompletedTasks = async (uid) => {
+  const userLists = await getUserLists(uid);
+  let tasks = [];
+  for await (const list of userLists) {
+    const q = query(
+      collection(db, "lists", list.listId, "tasks"),
+      where("completed", "==", true)
+    );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      tasks.push(doc.data());
+    });
+  }
+
+  return tasks;
+};
+
+const createList = async (name, uid) => {
+  await setDoc(doc(collection(db, "lists")), {
+    name: name,
+    userId: uid,
+  });
+};
+
+const deleteList = async (listId) => {
+  await deleteDoc(doc(db, "lists", listId));
+};
+
 const firestore = {
-  addUser,
   userExist,
   createUser,
-  addTasktoList,
-  getTasksofList,
+  addTask,
+  getList,
+  updateTask,
+  deleteTask,
+  getUserLists,
+  getTodayTasks,
+  getImportantTasks,
+  getCompletedTasks,
+  createList,
+  deleteList,
 };
 
 export default firestore;

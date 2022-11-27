@@ -1,14 +1,13 @@
+import { loginDemo } from "./demoController";
+import { addTask, toggleTask, createList, loadTabs, deleteList } from "./index";
+
 import {
-  addTask,
-  toggleTask,
-  createList,
-  loadTabs,
-  deleteList,
-  googleSignIn,
   signOutUser,
   registerUser,
   signIn,
-} from "./index";
+  googleSignIn,
+  anonySignIn,
+} from "./userController";
 
 const maincontent = document.querySelector(".maincontent");
 const loginBtn = document.querySelector("#loginbtn");
@@ -21,10 +20,12 @@ const loginPageBtn = document.querySelector("#loginpagebtn");
 const loginForm = document.querySelector("#loginform");
 const signupForm = document.querySelector("#signupform");
 const registerBtn = document.querySelector("#registerbtn");
+const demoBtn = document.querySelector("#demobtn");
 
 const userControl = () => {
   logoutBtn.addEventListener("click", signOutUser);
   googleBtn.addEventListener("click", googleSignIn);
+  demoBtn.addEventListener("click", anonySignIn);
   registerBtn.addEventListener("click", () => {
     const email = document.querySelector("#sign_email");
     const password = document.querySelector("#sign_password");
@@ -89,6 +90,10 @@ const loginDisplay = (username, picUri) => {
     icon.style.borderRadius = "50px";
     icon.src = picUri;
     userpicBox.appendChild(icon);
+  } else {
+    userpicBox.innerHTML = `<span class="material-symbols-outlined">
+    account_circle
+    </span>`;
   }
   usernameBox.textContent = username;
   usernameBox.removeAttribute("hidden");
@@ -156,7 +161,7 @@ const loadLists = (listArray) => {
   //add list button for each list
   listArray.forEach((list) => {
     console.log(list);
-    if (list.listId == 0) {
+    if (list.listId.indexOf("DEFAULT") >= 0) {
       return;
     }
     listContainer.innerHTML += `<div class="list"><button class="list" data-list=${list.listId}>
@@ -249,7 +254,7 @@ const displayTasks = (taskArray) => {
   taskContainer.innerHTML = "";
 
   //display all task
-  console.log(taskArray);
+  console.log("task array to display", taskArray);
   taskArray.forEach((task, index) => {
     const taskTemplate = `<div class="${
       task.completed ? "task completed" : "task"

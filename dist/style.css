@@ -45,6 +45,10 @@ body {
     margin-right: 1rem;
 }
 
+#userpic > .material-symbols-outlined {
+    font-size: 2.5rem;
+}
+
 #logoutbtn {
     border: #e53170 solid;
     border-radius: 5px;
@@ -335,7 +339,7 @@ button.dellist {
 
 .taskname {
     flex: 1;
-    font-size: 2rem;
+    font-size: 1.5rem;
 }
 
 .taskimportant.true > .material-symbols-outlined {
