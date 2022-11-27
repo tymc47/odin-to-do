@@ -14,3 +14,11 @@ export function getDate(offset = 0) {
 
   return yyyy + "-" + mm + "-" + dd;
 }
+
+export function compareDate(a, b) {
+  if (!a) return 1;
+  if (!b) return -1;
+  if (a > b) return 1;
+  else if (b > a) return -1;
+  else return 0;
+}

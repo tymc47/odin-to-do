@@ -87,7 +87,6 @@ export const registerUser = (email, password, confirm) => {
   createUserWithEmailAndPassword(getAuth(), email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      console.log(userCredential.user);
     })
     .catch((err) => {
       displaySignupMsg("Error: " + err.message);

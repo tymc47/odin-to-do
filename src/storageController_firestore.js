@@ -13,7 +13,6 @@ import { list } from "./objectController";
 import { getDate } from "./utils";
 
 const userExist = async (uid) => {
-  console.log(uid);
   const userRef = doc(db, "users", uid);
   const userSnap = await getDoc(userRef);
   return userSnap.exists();
