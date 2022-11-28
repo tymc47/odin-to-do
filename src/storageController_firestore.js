@@ -7,6 +7,7 @@ import {
   where,
   getDocs,
   deleteDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "./index";
 import { list } from "./objectController";
@@ -148,7 +149,15 @@ const createList = async (name, uid) => {
 };
 
 const deleteList = async (listId) => {
-  await deleteDoc(doc(db, "lists", listId));
+  const batch = writeBatch(db);
+  const tasksQ = await getDocs(collection(db, "lists", listId, "tasks"));
+  tasksQ.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+
+  batch.delete(doc(db, "lists", listId));
+
+  await batch.commit();
 };
 
 const firestore = {
