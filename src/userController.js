@@ -115,7 +115,6 @@ const authStateObserver = async (user) => {
     const listarray = await firestore.getUserLists(user.uid);
 
     loginDisplay(username, proPic);
-    sidebarBtnFunction();
     loadLists(listarray);
     loadTabs("Tasks");
 

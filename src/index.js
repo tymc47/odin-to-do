@@ -4,6 +4,7 @@ import {
   loadMainContent,
   displayCompleted,
   userControl,
+  sidebarBtnFunction,
 } from "./domController";
 import { task } from "./objectController";
 import { initFirebaseAuth } from "./userController";
@@ -120,7 +121,7 @@ const createList = async (name) => {
     DEMO_createList(name, user.uid);
   } else firestore.createList(name, user.uid);
 
-  const listArray = await firestore.getUserLists(uid);
+  const listArray = await firestore.getUserLists(user.uid);
   loadLists(listArray);
 };
 
@@ -133,6 +134,7 @@ const deleteList = async (listId) => {
 };
 
 //signOutUser()
+sidebarBtnFunction();
 initFirebaseAuth();
 userControl();
 
